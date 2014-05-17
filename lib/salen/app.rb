@@ -14,12 +14,12 @@ module Salen
 
     class << self
       def routes
-        @routes ||= {}
+        @routes ||= Hash.new {|h,k| h[k] = Hash.new(&h.default_proc) }
       end
 
       HTTP_VERBS.each do |method|
         define_method method do |path, &block|
-          (routes[method] ||= {})[path] = Proc.new &block
+          routes[method][path] = Proc.new &block
         end
       end
 
