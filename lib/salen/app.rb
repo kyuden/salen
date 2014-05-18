@@ -5,10 +5,8 @@ module Salen
     HTTP_VERBS = %i(get post)
 
     def call env
-      request = Rack::Request.new env
-      handler = self.class.routes.fetch(request.request_method.downcase.to_sym).fetch(request.path)
-      response = Rack::Response.new handler.call
-      response["Content-Type"] = "text/html"
+      request = Request.new env
+      response = Response.new request.body(self.class), request.status, request.headers
       response.finish
     end
 
@@ -28,5 +26,28 @@ module Salen
         Rack::Handler::WEBrick.run new
       end
     end
+  end
+
+  class Request < Rack::Request
+    attr_accessor :headers, :status
+
+    def initialize env
+      @headers = {'Content-Type' => 'text/html'}
+      @status  = 200
+      super env
+    end
+
+    def redirect_to uri
+      @headers = { "Location" => uri }
+      @status  = 301
+    end
+
+    def body app_class
+       body_proc = app_class.routes.fetch(request_method.downcase.to_sym).fetch(path)
+       [instance_eval(&body_proc).to_s]
+    end
+  end
+
+  class Response < Rack::Response
   end
 end

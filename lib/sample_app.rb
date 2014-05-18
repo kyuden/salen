@@ -5,8 +5,8 @@ class SampleApp < Salen::App
     'Hello world'
   end
 
-  post '/kyuden' do
-    'kyuden world'
+  get '/kyuden' do
+    redirect_to "/"
   end
 end
 
