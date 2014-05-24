@@ -1,4 +1,5 @@
 require 'rack'
+require 'tilt'
 
 module Salen
   class App
@@ -40,6 +41,18 @@ module Salen
     def redirect_to uri
       @headers = { "Location" => uri }
       @status  = 301
+    end
+
+    def haml template
+      render :haml, template_path(template, '.html.haml')
+    end
+
+    def template_path template, extention
+      File.join('views', template + extention)
+    end
+
+    def render engin, template
+      Tilt.new(template).render
     end
 
     def body app_class
