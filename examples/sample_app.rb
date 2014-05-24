@@ -8,6 +8,10 @@ class SampleApp < Salen::App
   get '/kyuden' do
     redirect_to "/"
   end
+
+  get '/recipe' do
+    haml 'index'
+  end
 end
 
 SampleApp.run!
