@@ -23,8 +23,16 @@ module Salen
       end
 
       def run!
-        Rack::Builder.new.use Rack::CommonLogger
-        Rack::Handler::WEBrick.run new
+        app = new
+        builder =
+          Rack::Builder.new do
+            run app
+            use Rack::ShowExceptions
+            use Rack::CommonLogger
+            use Rack::Lint
+          end
+
+        Rack::Handler::WEBrick.run builder
       end
     end
   end
