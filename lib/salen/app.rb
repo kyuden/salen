@@ -30,7 +30,7 @@ module Salen
   end
 
   class Request < Rack::Request
-    attr_accessor :headers, :status
+    attr_accessor :headers, :status, :params, :route_body
 
     def initialize env
       @headers = {'Content-Type' => 'text/html'}
@@ -56,9 +56,34 @@ module Salen
     end
 
     def body app_class
-       body_proc = app_class.routes.fetch(request_method.downcase.to_sym).fetch(path)
-       [instance_eval(&body_proc).to_s]
+      dispatch_route(app_class.routes.fetch(request_method.downcase.to_sym), path)
+      [instance_eval(&route_body.last).to_s]
     end
+
+    private
+
+      def dispatch_route routes, path
+         @params = Hash[params_values(routes).zip(params_keys)].invert
+      end
+
+      def params_keys
+        keys = []
+        route_body.first.gsub %r<:([^/])+> do |k,v|
+          keys.push k.delete!(':').to_sym
+        end
+        keys
+      end
+
+      def params_values routes
+        vals = []
+        @route_body =
+        routes.detect do |k,v|
+          path.match Regexp.new("^"+k.gsub(%r<:([^/])+>, "([^/])+")+"$") do |md|
+            vals = md[1..-1]
+          end
+        end
+        vals
+      end
   end
 
   class Response < Rack::Response
