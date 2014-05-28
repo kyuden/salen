@@ -1,6 +1,26 @@
 # Salen
 
-TODO: Write a gem description
+Salen is a small and callow web application framework in Ruby.  
+
+```ruby
+require 'salen'
+
+class SampleApp < Salen::App
+  get '/' do
+    'Hello Salen'
+  end
+end
+
+SampleApp.run!
+```
+
+And run with:
+
+```
+ruby sample_app.rb
+```
+
+View at: http://localhost:8080
 
 ## Installation
 
@@ -16,9 +36,46 @@ Or install it yourself as:
 
     $ gem install salen
 
-## Usage
+## Routes
 
-TODO: Write usage instructions here
+In Salen, a route is an HTTP method paired with a URL-matching pattern. Each route is associated with a block:
+
+```ruby
+get '/' do
+  .. show something ..
+end
+```
+
+Route patterns may include named parameters, accessible via the params hash:
+```ruby
+get '/hello/:name' do
+  # matches "GET /hello/foo" and "GET /hello/bar"
+  # params[:name] is 'foo' or 'bar'
+  "Hello #{params[:name]}!"
+end
+```
+### Browser Redirect
+
+You can trigger a browser redirect with the redirect helper method:
+
+```ruby
+get '/hello' do
+  redirect_to "/"
+end
+```
+
+## Views / Templates
+
+Default template is haml 
+
+```ruby
+  get '/hello' do
+    haml 'index'
+  end
+```
+
+ 
+
 
 ## Contributing
 
